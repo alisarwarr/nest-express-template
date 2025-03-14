@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Backend</title>
+    <style>
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Arial', sans-serif;
+            color: #ffffff;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        body {
+            background: linear-gradient(45deg, #3f8fe0, #00c5d9, #3dbd61, #9e46b3);
+            background-size: 300% 300%;
+            animation: gradientAnimation 10s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body style="height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; background-color: #000000; color: #eee;">
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <script>
+        fetch('http://localhost:4000/notification', {
+            headers: {
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YmRhMjkxMmVlODk2YTQyYjgxNTJkZSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzQxNzcxODYwLCJleHAiOjE3NDE4NTgyNjB9.onltugr2ZluxnBa71gN9BkI9c7UXGjHk-NQc9SUhY0U'
+            }
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                const notifications = data.data.notifications;
+                const notificationsDiv = document.getElementById('notifications');
+                notifications.forEach((notification) => {
+                    const notificationElement = document.createElement('p');
+                    notificationElement.innerText = `"${notification.text}" send to user "${notification.userId}" .`;
+                    notificationsDiv.appendChild(notificationElement);
+                });
+            })
+            .catch((error) => console.log('error:', error));
+
+        const socket = io();
+
+        socket.on('new-notification', (notification) => {
+            const notificationsDiv = document.getElementById('notifications');
+            const notificationElement = document.createElement('p');
+            notificationElement.innerText = `"${notification.text}" send to user "${notification.userId}" .`;
+            notificationsDiv.appendChild(notificationElement);
+        });
+    </script>
+
+    <h1 style="color: #000; font-family: Arial, sans-serif; text-align: center"> NestJS ExpressJS </h1>
+
+    <div id="notifications"></div>
+</body>
+
+</html>
